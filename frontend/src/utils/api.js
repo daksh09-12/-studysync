@@ -11,7 +11,10 @@ const BASE = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 const api = axios.create({
   baseURL: BASE,
   timeout: 8000,
-  headers: { 'Content-Type': 'application/json' },
+  headers: { 
+    'Content-Type': 'application/json',
+    'Bypass-Tunnel-Reminder': 'true'
+  },
   withCredentials: true // Crucial for sending/receiving HttpOnly cookies (SSDLC)
 });
 
