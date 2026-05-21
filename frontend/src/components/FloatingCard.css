@@ -1,0 +1,126 @@
+/* ── FloatingCard — Minimalist with Drag Handle ────────────── */
+.fcard {
+  position: absolute;
+  width: 260px;
+  min-height: 180px;
+  border-radius: var(--radius-lg);
+  background: #FFFDE7;
+  border: 1.5px solid #F0E68C;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  user-select: none;
+  transition: box-shadow var(--duration), transform var(--duration);
+  overflow: hidden;
+}
+
+.fcard:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  z-index: 20;
+}
+
+.fcard--dragging {
+  cursor: grabbing;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.16);
+  transform: rotate(1deg);
+  transition: none;
+}
+
+/* Header — PRIMARY DRAG HANDLE */
+.fcard__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px 8px;
+  cursor: grab;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  background: rgba(0,0,0,0.03);
+  min-height: 38px;
+}
+
+.fcard--dragging .fcard__header {
+  cursor: grabbing;
+}
+
+.fcard__type {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8D6E00;
+}
+
+.fcard__drag-hint {
+  font-size: 14px;
+  color: #C0A030;
+  opacity: 0.5;
+  margin-left: auto;
+  margin-right: 8px;
+  cursor: grab;
+}
+
+.fcard--dragging .fcard__drag-hint {
+  cursor: grabbing;
+}
+
+.fcard__delete {
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  color: #8D6E00;
+  opacity: 0.4;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+  transition: opacity var(--duration), color var(--duration), background var(--duration);
+}
+.fcard__delete:hover {
+  opacity: 1;
+  color: var(--danger);
+  background: rgba(234, 67, 53, 0.1);
+}
+
+/* Body — the text area (NOT draggable, click to type) */
+.fcard__body {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: var(--space-3);
+  font-size: 15px;
+  line-height: 1.6;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1A1A1A;
+  cursor: text;
+  min-height: 100px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  user-select: text;
+}
+
+.fcard__body::placeholder {
+  color: #B8A040;
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* Footer — SECONDARY DRAG HANDLE */
+.fcard__footer {
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #8D6E00;
+  text-align: right;
+  border-top: 1px solid rgba(0,0,0,0.04);
+  background: rgba(0,0,0,0.02);
+  cursor: grab;
+  min-height: 30px;
+}
+
+.fcard--dragging .fcard__footer {
+  cursor: grabbing;
+}
