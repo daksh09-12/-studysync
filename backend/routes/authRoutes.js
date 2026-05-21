@@ -16,12 +16,15 @@ const JWT_SECRET = process.env.JWT_SECRET || 'studysync_jwt_secret_key_2026';
 const ONE_DAY    = 24 * 60 * 60 * 1000;
 
 // Cookie options helper
-const getCookieOptions = () => ({
-  httpOnly: true,
-  secure:   process.env.NODE_ENV === 'production',
-  sameSite: 'strict',
-  maxAge:   ONE_DAY
-});
+const getCookieOptions = (req) => {
+  const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
+  return {
+    httpOnly: true,
+    secure:   isSecure,
+    sameSite: isSecure ? 'none' : 'lax',
+    maxAge:   ONE_DAY
+  };
+};
 
 // ── POST /register — Register a new account ──────────────────────────────────
 router.post('/register', validateRegister, async (req, res) => {
@@ -48,7 +51,7 @@ router.post('/register', validateRegister, async (req, res) => {
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1d' });
 
     // Set cookie
-    res.cookie('token', token, getCookieOptions());
+    res.cookie('token', token, getCookieOptions(req));
 
     return res.status(201).json({
       success: true,
@@ -98,7 +101,7 @@ router.post('/login', validateLogin, async (req, res) => {
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1d' });
 
     // Set cookie
-    res.cookie('token', token, getCookieOptions());
+    res.cookie('token', token, getCookieOptions(req));
 
     return res.status(200).json({
       success: true,
@@ -117,11 +120,9 @@ router.post('/login', validateLogin, async (req, res) => {
 
 // ── POST /logout — Clear authentication cookie ──────────────────────────────
 router.post('/logout', (req, res) => {
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure:   process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
-  });
+  const options = getCookieOptions(req);
+  delete options.maxAge;
+  res.clearCookie('token', options);
 
   return res.status(200).json({
     success: true,

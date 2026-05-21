@@ -42,10 +42,11 @@ async function authMiddleware(req, res, next) {
     console.error('Auth middleware error:', err.message);
     
     // Clear invalid cookies
+    const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
     res.clearCookie('token', {
       httpOnly: true,
-      secure:   process.env.NODE_ENV === 'production',
-      sameSite: 'strict'
+      secure:   isSecure,
+      sameSite: isSecure ? 'none' : 'lax'
     });
 
     return res.status(401).json({
