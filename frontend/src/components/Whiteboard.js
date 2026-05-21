@@ -342,7 +342,10 @@ export default function Whiteboard({ socket, roomId, userName }) {
           <>
             <span className="wb__divider" />
             <span className="wb__size-label">{brushSize}px</span>
+            <label htmlFor="wb-brush-size" className="visually-hidden">Brush Size</label>
             <input
+              id="wb-brush-size"
+              name="brushSize"
               type="range" className="wb__size-range"
               min={1} max={24} value={brushSize}
               onChange={e => setBrushSize(Number(e.target.value))}

@@ -167,8 +167,10 @@ export default function Chat({ socket, roomId, userName }) {
         </div>
 
         <form className="chat__form" onSubmit={handleSend}>
+          <label htmlFor="chat-input" className="visually-hidden">Type a message…</label>
           <input
             id="chat-input"
+            name="message"
             type="text"
             className="chat__input"
             placeholder="Type a message…"

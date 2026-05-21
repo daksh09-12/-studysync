@@ -108,7 +108,10 @@ export default function FloatingCard({ card, onDrag, onUpdate, onDelete, pan, sc
       </div>
 
       {/* ── Editable body — click to type, NOT draggable ── */}
+      <label htmlFor={`fcard-body-${card.id}`} className="visually-hidden">Card Content</label>
       <textarea
+        id={`fcard-body-${card.id}`}
+        name="cardContent"
         className="fcard__body"
         value={content}
         onChange={e => setContent(e.target.value)}

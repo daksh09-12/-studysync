@@ -101,8 +101,10 @@ export default function Notes({ socket, roomId, userName }) {
         </div>
       </div>
 
+      <label htmlFor="notes-editor" className="visually-hidden">Notes Editor</label>
       <textarea
         id="notes-editor"
+        name="notes"
         className="notes__editor"
         value={content}
         onChange={handleChange}

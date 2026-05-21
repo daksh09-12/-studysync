@@ -142,7 +142,7 @@ export default function Home() {
 
               <form onSubmit={handleCreateRoom} className="dashboard-form">
                 <div className="form-group">
-                  <label>Select Course Field</label>
+                  <span className="form-group-label">Select Course Field</span>
                   <div className="subject-selectors">
                     {SUBJECT_OPTIONS.map((sub) => (
                       <button
@@ -163,6 +163,7 @@ export default function Home() {
                   <label htmlFor="topic-input">Study Topic / Chapter</label>
                   <input
                     id="topic-input"
+                    name="topic"
                     type="text"
                     placeholder="e.g., Session 4: Designing REST endpoints"
                     value={topic}
@@ -191,7 +192,10 @@ export default function Home() {
               {joinErr && <div className="panel-error">⚠️ {joinErr}</div>}
 
               <form onSubmit={handleJoinRoom} className="dashboard-form join-form-inline">
+                <label htmlFor="room-code-input" className="visually-hidden">Room Access Code</label>
                 <input
+                  id="room-code-input"
+                  name="roomId"
                   type="text"
                   placeholder="CODE (e.g., AD3E7G)"
                   value={roomIdInput}

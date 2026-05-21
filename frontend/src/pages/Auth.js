@@ -92,6 +92,7 @@ export default function Auth() {
               <label htmlFor="nickname">Your Display Name</label>
               <input
                 id="nickname"
+                name="nickname"
                 type="text"
                 placeholder="e.g., Daksh, Alice"
                 value={nickname}

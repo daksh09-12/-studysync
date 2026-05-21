@@ -204,7 +204,8 @@
   gap: 8px;
 }
 
-.form-group label {
+.form-group label,
+.form-group .form-group-label {
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
