@@ -114,35 +114,13 @@ function parseCookies(cookieHeader) {
   return cookies;
 }
 
-// Socket.io security middleware (Handshake Authentication)
+// Socket.io handshake middleware
 io.use(async (socket, next) => {
   try {
-    const cookieHeader = socket.handshake.headers.cookie;
-    const cookies = parseCookies(cookieHeader);
-    
-    // Accept token from cookie or fallback query param during connection
-    const token = cookies.token || socket.handshake.auth?.token;
-
-    if (!token) {
-      return next(new Error('Authentication error: Token missing'));
-    }
-
-    const decoded = verifyToken(token);
-    if (!decoded) {
-      return next(new Error('Authentication error: Invalid or expired token'));
-    }
-
-    // Attach user metadata to socket
-    const user = await User.findById(decoded.id).select('-password');
-    if (!user) {
-      // Allow fallback in development if MongoDB is down, otherwise reject
-      if (process.env.NODE_ENV === 'production') {
-        return next(new Error('Authentication error: Account not found'));
-      }
-    }
-
-    socket.data.userId = decoded.id;
-    socket.data.username = user ? user.username : 'Guest';
+    // Read username directly from handshake auth or query params
+    const username = socket.handshake.auth?.username || socket.handshake.query?.username || 'Guest';
+    socket.data.userId = username;
+    socket.data.username = username;
     next();
   } catch (err) {
     return next(new Error('Authentication error: ' + err.message));

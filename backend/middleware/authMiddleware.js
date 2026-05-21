@@ -11,60 +11,24 @@ const User = require('../models/User');
 const JWT_SECRET = process.env.JWT_SECRET || 'studysync_jwt_secret_key_2026';
 
 /**
- * Verify JWT from cookie and attach user to request
+ * Verify username from x-username header and mock a user object
  */
 async function authMiddleware(req, res, next) {
-  try {
-    const token = req.cookies?.token;
-
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: 'Authentication required. Please log in.'
-      });
-    }
-
-    // Verify token
-    const decoded = jwt.verify(token, JWT_SECRET);
-
-    // Fetch user and attach to req (excluding password)
-    const user = await User.findById(decoded.id).select('-password');
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Session expired or user not found. Please log in again.'
-      });
-    }
-
-    req.user = user;
-    next();
-  } catch (err) {
-    console.error('Auth middleware error:', err.message);
-    
-    // Clear invalid cookies
-    const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
-    res.clearCookie('token', {
-      httpOnly: true,
-      secure:   isSecure,
-      sameSite: isSecure ? 'none' : 'lax'
-    });
-
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid or expired session. Please log in again.'
-    });
-  }
+  const username = req.headers['x-username'] || req.query.username || 'Guest';
+  req.user = {
+    _id: username,
+    username: username,
+    email: `${username}@studysync.local`,
+    createdAt: new Date()
+  };
+  next();
 }
 
 /**
- * Helper to manually verify a token (useful for Socket.io handshakes)
+ * Helper to manually verify a token (unused now, always returning mock verification)
  */
 function verifyToken(token) {
-  try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch (_) {
-    return null;
-  }
+  return null;
 }
 
 module.exports = {

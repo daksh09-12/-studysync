@@ -33,9 +33,8 @@ const roomSchema = new mongoose.Schema(
       maxlength: 200
     },
     createdBy: {
-      type:     mongoose.Schema.Types.ObjectId,
-      ref:      'User',
-      required: [true, 'Creator reference is required']
+      type:     String,
+      required: [true, 'Creator name is required']
     },
     creatorName: {
       type:     String,
@@ -54,7 +53,7 @@ const roomSchema = new mongoose.Schema(
     // Embedded sub-documents
     participants: [
       {
-        user:     { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        user:     { type: String },
         userName: { type: String, trim: true },
         joinedAt: { type: Date, default: Date.now }
       }

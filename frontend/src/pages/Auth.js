@@ -1,6 +1,6 @@
 /**
  * StudySync — Auth.js
- * Session Authentication UI (SSDLC)
+ * Choose Nickname UI (Bypassed Accounts)
  */
 
 import React, { useState, useEffect } from 'react';
@@ -10,94 +10,48 @@ import './Auth.css';
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { user, login, register, error, clearError, loading } = useAuth();
+  const { user, loginNickname, error, clearError, loading } = useAuth();
 
-  // Mode: 'login' | 'register'
-  const [mode, setMode] = useState('login');
-
-  // Input states
-  const [emailOrUsername, setEmailOrUsername] = useState('');
-  const [username, setUsername]               = useState('');
-  const [email, setEmail]                     = useState('');
-  const [password, setPassword]               = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
+  const [nickname, setNickname] = useState('');
   const [formError, setFormError] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
 
-  // Redirect if already logged in (SSDLC Session check)
+  // Redirect if nickname already selected
   useEffect(() => {
     if (user) {
       navigate('/', { replace: true });
     }
   }, [user, navigate]);
 
-  // Clear errors when toggling modes
-  const handleToggleMode = (newMode) => {
-    setMode(newMode);
-    setFormError('');
-    clearError();
-    setPassword('');
-    setConfirmPassword('');
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError('');
     clearError();
 
-    // Front-end validations (SSDLC: Sanity checks)
-    if (mode === 'login') {
-      if (!emailOrUsername.trim() || !password) {
-        setFormError('Please enter all credentials.');
-        return;
-      }
-      
-      setSubmitLoading(true);
-      try {
-        await login(emailOrUsername.trim(), password);
-        navigate('/', { replace: true });
-      } catch (err) {
-        // Error is set in AuthContext
-      } finally {
-        setSubmitLoading(false);
-      }
-    } else {
-      if (!username.trim() || !email.trim() || !password || !confirmPassword) {
-        setFormError('Please fill in all fields.');
-        return;
-      }
+    const name = nickname.trim();
+    if (!name) {
+      setFormError('Please enter a display name.');
+      return;
+    }
 
-      if (username.trim().length < 3) {
-        setFormError('Username must be at least 3 characters.');
-        return;
-      }
+    if (name.length < 3) {
+      setFormError('Name must be at least 3 characters.');
+      return;
+    }
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email.trim())) {
-        setFormError('Please enter a valid email address.');
-        return;
-      }
+    if (name.length > 20) {
+      setFormError('Name cannot exceed 20 characters.');
+      return;
+    }
 
-      if (password.length < 8) {
-        setFormError('Password must be at least 8 characters.');
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        setFormError('Passwords do not match.');
-        return;
-      }
-
-      setSubmitLoading(true);
-      try {
-        await register(username.trim(), email.trim(), password);
-        navigate('/', { replace: true });
-      } catch (err) {
-        // Error is set in AuthContext
-      } finally {
-        setSubmitLoading(false);
-      }
+    setSubmitLoading(true);
+    try {
+      loginNickname(name);
+      navigate('/', { replace: true });
+    } catch (err) {
+      setFormError(err.message || 'Failed to set display name.');
+    } finally {
+      setSubmitLoading(false);
     }
   };
 
@@ -120,28 +74,8 @@ export default function Auth() {
         <div className="auth-card__header">
           <h1 className="auth-card__brand">StudySync</h1>
           <p className="auth-card__subtitle">
-            {mode === 'login' 
-              ? 'Sign in to access your collaborative study rooms' 
-              : 'Create a secure account to start collaborating'}
+            Enter a display name to start collaborating with peers in real-time.
           </p>
-        </div>
-
-        {/* Tabs */}
-        <div className="auth-tabs">
-          <button 
-            type="button"
-            className={`auth-tab ${mode === 'login' ? 'auth-tab--active' : ''}`}
-            onClick={() => handleToggleMode('login')}
-          >
-            Login
-          </button>
-          <button 
-            type="button"
-            className={`auth-tab ${mode === 'register' ? 'auth-tab--active' : ''}`}
-            onClick={() => handleToggleMode('register')}
-          >
-            Register
-          </button>
         </div>
 
         {/* Error Alerts */}
@@ -153,94 +87,21 @@ export default function Auth() {
 
         {/* Auth Form */}
         <form onSubmit={handleSubmit} className="auth-form">
-          {mode === 'login' ? (
-            /* LOGIN FIELDS */
-            <div className="auth-form__group">
-              <div className="auth-input-wrapper">
-                <label htmlFor="emailOrUsername">Email or Username</label>
-                <input
-                  id="emailOrUsername"
-                  type="text"
-                  placeholder="name@example.com or username"
-                  value={emailOrUsername}
-                  onChange={(e) => setEmailOrUsername(e.target.value)}
-                  maxLength={100}
-                  required
-                  autoComplete="username"
-                />
-              </div>
-
-              <div className="auth-input-wrapper">
-                <label htmlFor="password">Password</label>
-                <input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete="current-password"
-                />
-              </div>
+          <div className="auth-form__group">
+            <div className="auth-input-wrapper">
+              <label htmlFor="nickname">Your Display Name</label>
+              <input
+                id="nickname"
+                type="text"
+                placeholder="e.g., Daksh, Alice"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                maxLength={20}
+                required
+                autoFocus
+              />
             </div>
-          ) : (
-            /* REGISTER FIELDS */
-            <div className="auth-form__group">
-              <div className="auth-input-wrapper">
-                <label htmlFor="username">Username</label>
-                <input
-                  id="username"
-                  type="text"
-                  placeholder="studysyncer"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  maxLength={30}
-                  required
-                  autoComplete="username"
-                />
-              </div>
-
-              <div className="auth-input-wrapper">
-                <label htmlFor="email">Email address</label>
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  maxLength={100}
-                  required
-                  autoComplete="email"
-                />
-              </div>
-
-              <div className="auth-input-wrapper">
-                <label htmlFor="password">Password</label>
-                <input
-                  id="password"
-                  type="password"
-                  placeholder="Min. 8 characters"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete="new-password"
-                />
-              </div>
-
-              <div className="auth-input-wrapper">
-                <label htmlFor="confirmPassword">Confirm Password</label>
-                <input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Re-enter password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  autoComplete="new-password"
-                />
-              </div>
-            </div>
-          )}
+          </div>
 
           <button 
             type="submit" 
@@ -248,7 +109,7 @@ export default function Auth() {
             disabled={submitLoading}
           >
             {submitLoading && <span className="btn-spinner" />}
-            {submitLoading ? 'Please wait…' : (mode === 'login' ? 'Sign In' : 'Sign Up')}
+            {submitLoading ? 'Entering…' : 'Enter StudySync'}
           </button>
         </form>
       </div>

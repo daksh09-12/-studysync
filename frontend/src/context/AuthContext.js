@@ -15,14 +15,13 @@ export function AuthProvider({ children }) {
 
   // ── Session Auto-Check on Mount (SSDLC: Secure state initialization) ─────
   useEffect(() => {
-    async function checkSession() {
+    function checkSession() {
       try {
-        const res = await getMe();
-        if (res.success && res.data) {
-          setUser(res.data);
+        const userJson = localStorage.getItem('studysync_user');
+        if (userJson) {
+          setUser(JSON.parse(userJson));
         }
       } catch (_) {
-        // Silent failure (unauthenticated is normal on first visit)
         setUser(null);
       } finally {
         setLoading(false);
@@ -31,42 +30,30 @@ export function AuthProvider({ children }) {
     checkSession();
   }, []);
 
-  const login = async (emailOrUsername, password) => {
+  const loginNickname = (nickname) => {
     setError('');
-    try {
-      const res = await loginUser({ emailOrUsername, password });
-      if (res.success && res.data) {
-        setUser(res.data);
-        return res.data;
-      }
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
+    const mockUser = {
+      id:       nickname,
+      username: nickname,
+      email:    `${nickname}@studysync.local`,
+      createdAt: new Date().toISOString()
+    };
+    localStorage.setItem('studysync_user', JSON.stringify(mockUser));
+    setUser(mockUser);
+    return mockUser;
+  };
+
+  const login = async (emailOrUsername, password) => {
+    return loginNickname(emailOrUsername);
   };
 
   const register = async (username, email, password) => {
-    setError('');
-    try {
-      const res = await registerUser({ username, email, password });
-      if (res.success && res.data) {
-        setUser(res.data);
-        return res.data;
-      }
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
+    return loginNickname(username);
   };
 
   const logout = async () => {
-    try {
-      await logoutUser();
-    } catch (err) {
-      console.error('Logout error:', err.message);
-    } finally {
-      setUser(null);
-    }
+    localStorage.removeItem('studysync_user');
+    setUser(null);
   };
 
   const clearError = () => setError('');
@@ -77,6 +64,7 @@ export function AuthProvider({ children }) {
     error,
     login,
     register,
+    loginNickname,
     logout,
     clearError,
     isAuthenticated: !!user

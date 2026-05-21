@@ -23,6 +23,9 @@ export function useSocket(roomId, userName) {
       transports:           ['websocket'],
       reconnectionAttempts: 5,
       reconnectionDelay:    1000,
+      auth: {
+        username: userName
+      },
       withCredentials:      true // Crucial: Transmit the HttpOnly session cookie during handshake (SSDLC)
     });
 

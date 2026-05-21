@@ -15,6 +15,20 @@ const api = axios.create({
   withCredentials: true // Crucial for sending/receiving HttpOnly cookies (SSDLC)
 });
 
+// Interceptor to inject x-username header
+api.interceptors.request.use((config) => {
+  const userJson = localStorage.getItem('studysync_user');
+  if (userJson) {
+    try {
+      const user = JSON.parse(userJson);
+      if (user && user.username) {
+        config.headers['x-username'] = user.username;
+      }
+    } catch (_) {}
+  }
+  return config;
+});
+
 // Uniform error extraction
 function extractError(err) {
   return err?.response?.data?.message || err?.message || 'Unknown error';
